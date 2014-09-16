@@ -46,15 +46,8 @@ class DefenceStrategy(BaseStrategy):
                     return ActionType.NONE
             else:
                 return ActionType.TAKE_PUCK
-        elif self.can_influence_opponent:
-            if self.last_action == ActionType.SWING and self.swing_ticks >= self.max_effective_swing_ticks:
-                return ActionType.STRIKE
-            else:
-                return ActionType.SWING
-        elif self.last_action == ActionType.SWING:
-            return ActionType.CANCEL_STRIKE
         else:
-            return ActionType.NONE
+            return self.influence_opponent_action
 
     @property
     def vector_from_goal_net_to_puck(self) -> Vector:

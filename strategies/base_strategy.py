@@ -205,6 +205,22 @@ class BaseStrategy:
     def get_goal_net_bottom_corner(player):
         return Point(player.net_front, player.net_bottom)
 
+    @property
+    def kick_opponent_action(self):
+        if self.last_action == ActionType.SWING and self.swing_ticks >= self.max_effective_swing_ticks:
+            return ActionType.STRIKE
+        else:
+            return ActionType.SWING
+
+    @property
+    def influence_opponent_action(self):
+        if self.can_influence_opponent:
+            return self.kick_opponent_action
+        elif self.last_action == ActionType.SWING:
+            return ActionType.CANCEL_STRIKE
+        else:
+            return ActionType.NONE
+
     #endregion
 
     #region Properties
