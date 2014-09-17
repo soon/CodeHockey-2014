@@ -69,6 +69,22 @@ class BaseStrategy:
         return self.get_goal_net_center(self.opponent)
 
     @property
+    def goal_net_horizontal(self):
+        return self.world.height / 2
+    
+    @property
+    def net_back(self):
+        return self.player.net_back
+
+    @property
+    def net_front(self):
+        return self.player.net_front
+
+    @property
+    def goal_net_height(self):
+        return self.game.goal_net_height
+
+    @property
     def player(self) -> Player:
         return first(self.world.players, lambda p: p.me)
 
@@ -100,6 +116,9 @@ class BaseStrategy:
 
     def get_angle_to_unit(self, unit):
         return self.me.get_angle_to_unit(unit)
+
+    def get_angle_to(self, x, y):
+        return self.me.get_angle_to(x, y)
 
     @property
     def angle(self):
@@ -207,7 +226,11 @@ class BaseStrategy:
 
     @property
     def kick_opponent_action(self):
-        if self.last_action == ActionType.SWING and self.swing_ticks >= self.max_effective_swing_ticks:
+        return self.swing_as_long_as_needed
+
+    @property
+    def swing_as_long_as_needed(self):
+        if self.swing_ticks >= self.max_effective_swing_ticks:
             return ActionType.STRIKE
         else:
             return ActionType.SWING
