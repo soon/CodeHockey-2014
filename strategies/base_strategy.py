@@ -70,7 +70,7 @@ class BaseStrategy:
 
     @property
     def goal_net_horizontal(self):
-        return self.world.height / 2
+        return 460
     
     @property
     def net_back(self):
