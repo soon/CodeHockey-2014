@@ -17,8 +17,8 @@ class ForwardStrategy(BaseStrategy):
 
         self._allowed_distance = 130
         self._allowed_distance_to_strike = 70
-        self._allowed_angle = 0.07
-        self._max_swing_ticks = 7
+        self._allowed_angle = 0.06
+        self._max_swing_ticks = 8
 
     @property
     def speed_up(self):
