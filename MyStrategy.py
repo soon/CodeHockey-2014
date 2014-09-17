@@ -16,12 +16,19 @@ class MyStrategy:
         return not any(h.type == HockeyistType.GOALIE for h in world.hockeyists)
 
     @staticmethod
+    def is_defender(me, hockeyists):
+        return me.id == min(h.id for h in hockeyists)
+
+    @staticmethod
     def create_strategy(me, world, game, move) -> BaseStrategy:
+        strategy = BaseStrategy(me, world, game, move)
+
         if MyStrategy.no_goalies(world):
             strategy = NoGoaliesStrategy
+        elif MyStrategy.is_defender(me, strategy.my_hockeyists):
+            strategy = DefenceStrategy
         else:
-            strategy = [ForwardStrategy,
-                        DefenceStrategy][me.teammate_index]
+            strategy = ForwardStrategy
 
         return strategy(me, world, game, move)
 
