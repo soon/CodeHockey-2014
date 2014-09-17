@@ -28,11 +28,14 @@ class DefenceStrategy(BaseStrategy):
 
     @property
     def turn(self):
-        optimal_position = self.optimal_position
-        if self.get_distance_to_unit(optimal_position) > self._allowed_distance_to_point:
-            return self.get_angle_to_unit(optimal_position)
+        if self.own_puck:
+            return self.angle_to_nearest_teammate
         else:
-            return self.angle_to_puck
+            optimal_position = self.optimal_position
+            if self.get_distance_to_unit(optimal_position) > self._allowed_distance_to_point:
+                return self.get_angle_to_unit(optimal_position)
+            else:
+                return self.angle_to_puck
 
     @property
     def action(self):
