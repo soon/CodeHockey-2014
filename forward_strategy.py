@@ -2,9 +2,10 @@
 This module provides classes for representing forward strategy
 """
 from math import copysign
+
 from model.ActionType import ActionType
-from strategies.base_strategy import BaseStrategy
-from utils.point import Point
+from base_strategy import BaseStrategy
+from point import Point
 
 
 __all__ = ['ForwardStrategy']

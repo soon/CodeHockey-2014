@@ -2,6 +2,8 @@
 This module provides class for representing base strategy.
 Every strategy should inherit this class.
 """
+from math import pi
+
 from model.HockeyistState import HockeyistState
 from model.HockeyistType import HockeyistType
 from model.Puck import Puck
@@ -12,10 +14,8 @@ from model.Hockeyist import Hockeyist
 from model.Move import Move
 from model.Unit import Unit
 from model.World import World
-from utils.iter import first
-from utils.point import Point
-
-from math import pi
+from iter import first
+from point import Point
 
 
 __all__ = ['BaseStrategy']

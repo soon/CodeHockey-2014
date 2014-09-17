@@ -3,10 +3,10 @@ This module provides classes for representing defender strategy
 """
 from model.ActionType import ActionType
 
-from strategies.base_strategy import BaseStrategy
+from base_strategy import BaseStrategy
 
-from utils.point import Point
-from utils.vector import Vector
+from point import Point
+from vector import Vector
 
 
 __all__ = ['DefenceStrategy']

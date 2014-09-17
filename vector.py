@@ -2,7 +2,8 @@
 This module provides classes for representing vector
 """
 from math import hypot
-from utils.point import Point
+
+from point import Point
 
 
 class Vector:

@@ -1,9 +1,9 @@
 """
 This module provides classes for representing strategy in case if there is no goalies
 """
-from strategies.base_strategy import BaseStrategy
-from strategies.defence_strategy import DefenceStrategy
-from strategies.simple_striker_strategy import SimpleStrikerStrategy
+from base_strategy import BaseStrategy
+from defence_strategy import DefenceStrategy
+from simple_striker_strategy import SimpleStrikerStrategy
 
 
 __all__ = ['NoGoaliesStrategy']

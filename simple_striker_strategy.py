@@ -2,7 +2,7 @@
 This module provides classes for representing simply striker strategy
 """
 from model.ActionType import ActionType
-from strategies.base_strategy import BaseStrategy
+from base_strategy import BaseStrategy
 
 
 class SimpleStrikerStrategy(BaseStrategy):

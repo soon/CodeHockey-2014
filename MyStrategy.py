@@ -3,10 +3,10 @@ from model.HockeyistType import HockeyistType
 from model.Move import Move
 from model.Hockeyist import Hockeyist
 from model.World import World
-from strategies.forward_strategy import ForwardStrategy
-from strategies.base_strategy import BaseStrategy
-from strategies.defence_strategy import DefenceStrategy
-from strategies.no_goalies_strategy import NoGoaliesStrategy
+from forward_strategy import ForwardStrategy
+from base_strategy import BaseStrategy
+from defence_strategy import DefenceStrategy
+from no_goalies_strategy import NoGoaliesStrategy
 
 
 class MyStrategy:

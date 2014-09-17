@@ -1,6 +1,6 @@
-from strategies.base_strategy import BaseStrategy
+from base_strategy import BaseStrategy
 
-from utils.point import Point
+from point import Point
 
 
 __all__ = ['DumbStrategy']
