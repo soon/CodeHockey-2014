@@ -14,25 +14,26 @@ class MyStrategy:
     def __init__(self):
         self._strategies_info = None
 
-        self.strategies_info = {strategy: strategy.initial_info for strategy in self.strategies}
+        self.strategies_info = {strategy: strategy.initial_info() for strategy in self.strategies}
 
     @staticmethod
     def no_goalies(world):
         return not any(h.type == HockeyistType.GOALIE for h in world.hockeyists)
 
     @staticmethod
-    def is_defender(me, hockeyists):
-        return me.id == min(h.id for h in hockeyists)
+    def is_forward(strategy: BaseStrategy):
+        return strategy.own_puck or sorted(strategy.my_hockeyists,
+                                           key=lambda h: h.get_distance_to_unit(strategy.puck))[0].id == strategy.me.id
 
     def create_strategy(self, me, world, game, move) -> BaseStrategy:
         strategy = BaseStrategy(me, world, game, move, self.strategies_info[BaseStrategy])
 
         if MyStrategy.no_goalies(world):
             strategy = NoGoaliesStrategy
-        elif MyStrategy.is_defender(me, strategy.my_hockeyists):
-            strategy = DefenceStrategy
-        else:
+        elif MyStrategy.is_forward(strategy):
             strategy = ForwardStrategy
+        else:
+            strategy = DefenceStrategy
 
         return strategy(me, world, game, move, self.strategies_info[strategy])
 
