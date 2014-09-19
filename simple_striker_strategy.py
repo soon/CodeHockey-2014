@@ -7,8 +7,8 @@ from base_strategy import BaseStrategy
 
 class SimpleStrikerStrategy(BaseStrategy):
 
-    def __init__(self, me, world, game, move):
-        super().__init__(me, world, game, move)
+    def __init__(self, me, world, game, move, info):
+        super().__init__(me, world, game, move, info)
 
         self._allowed_angle = 0.07
 
@@ -22,5 +22,3 @@ class SimpleStrikerStrategy(BaseStrategy):
             return ActionType.STRIKE
         else:
             return ActionType.NONE
-
-

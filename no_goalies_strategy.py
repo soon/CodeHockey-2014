@@ -11,12 +11,12 @@ __all__ = ['NoGoaliesStrategy']
 
 class NoGoaliesStrategy(BaseStrategy):
 
-    def __init__(self, me, world, game, move):
-        super().__init__(me, world, game, move)
+    def __init__(self, me, world, game, move, info):
+        super().__init__(me, world, game, move, info)
 
         strategy = SimpleStrikerStrategy if self.our_team_own_puck else DefenceStrategy
 
-        self.strategy = strategy(me, world, game, move)
+        self.strategy = strategy(me, world, game, move, info)
 
     @property
     def speed_up(self):

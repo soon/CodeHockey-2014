@@ -13,8 +13,8 @@ __all__ = ['ForwardStrategy']
 
 class ForwardStrategy(BaseStrategy):
 
-    def __init__(self, me, world, game, move):
-        super().__init__(me, world, game, move)
+    def __init__(self, me, world, game, move, info):
+        super().__init__(me, world, game, move, info)
 
         self._allowed_distance = 130
         self._allowed_distance_to_strike = 70

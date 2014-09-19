@@ -23,16 +23,18 @@ __all__ = ['BaseStrategy']
 
 class BaseStrategy:
 
-    def __init__(self, me: Hockeyist, world: World, game: Game, move: Move):
+    def __init__(self, me: Hockeyist, world: World, game: Game, move: Move, info):
         self._me = None
         self._world = None
         self._game = None
         self._move = None
+        self._info = None
 
         self.me = me
         self.world = world
         self.game = game
         self.move = move
+        self.info = info
 
     #region Utils
 
@@ -316,5 +318,20 @@ class BaseStrategy:
         :return: By default returns ActionType.NONE
         """
         return ActionType.NONE
+
+    @property
+    def info(self):
+        """
+        Allows to share info between instances of strategies
+        """
+        return self._info
+
+    @info.setter
+    def info(self, value):
+        self._info = value
+
+    @property
+    def initial_info(self):
+        return {}
 
     #endregion
