@@ -232,10 +232,26 @@ class BaseStrategy:
 
     @property
     def swing_as_long_as_needed(self):
-        if self.swing_ticks >= self.max_effective_swing_ticks:
+        return self.swing_at_most(self.max_effective_swing_ticks)
+
+    def swing_at_most(self, max_swing_ticks):
+        if self.swing_ticks >= max_swing_ticks:
             return ActionType.STRIKE
         else:
             return ActionType.SWING
+
+    @property
+    def take_puck_or_attack_opponent(self):
+        if self.own_puck:
+            return ActionType.NONE
+        elif self.can_influence_puck:
+            return ActionType.TAKE_PUCK
+        elif self.can_influence_opponent:
+            return self.kick_opponent_action
+        elif self.last_action == ActionType.SWING:
+            return ActionType.CANCEL_STRIKE
+        else:
+            return ActionType.NONE
 
     @property
     def influence_opponent_action(self):
@@ -330,8 +346,8 @@ class BaseStrategy:
     def info(self, value):
         self._info = value
 
-    @property
-    def initial_info(self):
+    @staticmethod
+    def initial_info():
         return {}
 
     #endregion
