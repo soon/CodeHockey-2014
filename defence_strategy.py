@@ -1,6 +1,7 @@
 """
 This module provides classes for representing defender strategy
 """
+from enum import Enum
 from model.ActionType import ActionType
 
 from base_strategy import BaseStrategy
@@ -12,60 +13,143 @@ from vector import Vector
 __all__ = ['DefenceStrategy']
 
 
+class StrategyState(Enum):
+    undefined = 1
+    move_to_defence_point = 2
+    normalize_speed = 3
+    wait_for_attack = 4
+    the_puck_is_moving_to_our_goal_net = 5
+    prevent_attack = 6
+
+
 class DefenceStrategy(BaseStrategy):
 
     def __init__(self, me, world, game, move, info):
         super().__init__(me, world, game, move, info)
 
-        self._allowed_distance_to_point = 50
-        self._max_distance = 50
-        self._coefficient = 0.7
-        self._max_opponent_distance = self._max_distance / self._coefficient
+        self._allowed_distance_to_defence_point = 50
+
+        self.update_state()
 
     @property
     def speed_up(self):
-        return self.optimal_distance / 170
+        return {
+            StrategyState.undefined: 0.0,
+            StrategyState.move_to_defence_point: self.speed_up_to_defence_point,
+            StrategyState.normalize_speed: 0.0,
+            StrategyState.wait_for_attack: 0.0,
+            StrategyState.the_puck_is_moving_to_our_goal_net: 0.0,
+            StrategyState.prevent_attack: 0.0
+        }[self.state]
 
     @property
     def turn(self):
-        if self.own_puck:
-            return self.angle_to_nearest_teammate
-        else:
-            optimal_position = self.optimal_position
-            if self.get_distance_to_unit(optimal_position) > self._allowed_distance_to_point:
-                return self.get_angle_to_unit(optimal_position)
-            else:
-                return self.angle_to_puck
+        return {
+            StrategyState.undefined: 0.0,
+            StrategyState.move_to_defence_point: self.angle_to_defence_point,
+            StrategyState.normalize_speed: 0.0,
+            StrategyState.wait_for_attack: self.angle_to_puck,
+            StrategyState.the_puck_is_moving_to_our_goal_net: self.angle_to_puck,
+            StrategyState.prevent_attack: self.angle_to_puck
+        }[self.state]
 
     @property
     def action(self):
-        if self.can_influence_puck:
-            if self.own_puck:
-                self.pass_angle = self.get_pass_angle_to(self.nearest_teammate)
+        return {
+            StrategyState.undefined: ActionType.NONE,
+            StrategyState.move_to_defence_point: self.take_puck_or_attack_opponent,
+            StrategyState.normalize_speed: self.take_puck_or_attack_opponent,
+            StrategyState.wait_for_attack: self.take_puck_or_attack_opponent,
+            StrategyState.the_puck_is_moving_to_our_goal_net: ActionType.NONE,
+            StrategyState.prevent_attack: ActionType.STRIKE
+        }[self.state]
 
-                if self.can_pass_to(self.nearest_teammate):
-                    return ActionType.PASS
-                else:
-                    return ActionType.NONE
-            else:
-                return ActionType.TAKE_PUCK
-        else:
-            return self.influence_opponent_action
+    def update_state(self):
+        state = self.get_next_state(self.state)
 
+        while self.state != state:
+            self.state = state
+            state = self.get_next_state(self.state)
+
+    def get_next_state(self, state):
+        if self.distance_to_defence_point > self._allowed_distance_to_defence_point:
+            if self.state in (StrategyState.undefined,
+                              StrategyState.move_to_defence_point,
+                              StrategyState.normalize_speed,
+                              StrategyState.wait_for_attack):
+                return StrategyState.move_to_defence_point
+
+        if state == StrategyState.undefined:
+            return StrategyState.move_to_defence_point
+        elif (state == StrategyState.move_to_defence_point and
+                self.distance_to_defence_point < self._allowed_distance_to_defence_point):
+            return StrategyState.normalize_speed
+        elif state == StrategyState.normalize_speed:
+            return StrategyState.wait_for_attack
+        elif state == StrategyState.wait_for_attack and self.puck_is_moving_to_our_goal_net:
+            return StrategyState.the_puck_is_moving_to_our_goal_net
+        elif state == StrategyState.the_puck_is_moving_to_our_goal_net:
+            if not self.puck_is_moving_to_our_goal_net:
+                return StrategyState.move_to_defence_point
+            if self.can_influence_puck:
+                return StrategyState.prevent_attack
+        elif state == StrategyState.prevent_attack and not self.puck_is_moving_to_our_goal_net:
+            return StrategyState.move_to_defence_point
+
+        return state
+
+    @staticmethod
+    def get_defence_vertical(player):
+        return abs(150 - player.net_back)
+
+    @property
+    def defence_vertical(self):
+        return self.get_defence_vertical(self.player)
+
+    @property
+    def defence_point(self):
+        return Point(self.defence_vertical, self.goal_net_horizontal)
+    
+    @property
+    def distance_to_defence_point(self):
+        return self.get_distance_to_unit(self.defence_point)
+
+    @property
+    def speed_up_to_defence_point(self):
+        speed_up = self.distance_to_defence_point / 100
+
+        if self.unit_is_behind(self.defence_point):
+            speed_up = -speed_up
+
+        return speed_up
+
+    @property
+    def angle_to_defence_point(self):
+        angle = self.get_angle_to_unit(self.defence_point)
+        
+        if self.unit_is_behind(self.defence_point):
+            angle = self.invert_angle(angle)
+            
+        return angle
+    
     @property
     def vector_from_goal_net_to_puck(self) -> Vector:
         return Vector(self.goal_net_center, self.puck)
 
     @property
-    def optimal_position(self) -> Point:
-        v = self.vector_from_goal_net_to_puck
-        v.length = self.optimal_distance
-        return v.end
-
-    @property
-    def optimal_distance(self):
-        return max(self._max_distance, int(self.distance_to_puck * self._coefficient))
-
-    @property
     def distance_from_net_to_player(self):
         return self.get_distance_to_unit(self.goal_net_center)
+
+    @staticmethod
+    def initial_info():
+        return {
+            'state': StrategyState.undefined
+        }
+
+    @property
+    def state(self):
+        return self.info['state']
+
+    @state.setter
+    def state(self, value):
+        self.info['state'] = value
