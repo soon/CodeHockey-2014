@@ -16,7 +16,27 @@ class NoGoaliesStrategy(BaseStrategy):
 
         strategy = SimpleStrikerStrategy if self.our_team_own_puck else DefenceStrategy
 
-        self.strategy = strategy(me, world, game, move, info)
+        self.strategy = strategy(me, world, game, move, info[strategy])
+
+    @staticmethod
+    def initial_info():
+        return {
+            SimpleStrikerStrategy: SimpleStrikerStrategy.initial_info(),
+            DefenceStrategy: DefenceStrategy.initial_info()
+        }
+
+    @property
+    def info(self):
+        self._info[type(self.strategy)] = self.strategy.info
+
+        return self._info
+
+    @info.setter
+    def info(self, value):
+        if len(value) == 2 and SimpleStrikerStrategy in value and DefenceStrategy in value:
+            self._info = value
+        else:
+            super().info[type(self.strategy)] = value
 
     @property
     def speed_up(self):
