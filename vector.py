@@ -1,15 +1,23 @@
 """
 This module provides classes for representing vector
 """
-from math import hypot
+from math import hypot, atan2, pi
 
 from point import Point
 
 
 class Vector:
-    def __init__(self, start: Point, end: Point):
-        self.start = start
-        self.end = end
+    def __init__(self, a, b):
+
+        if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+            self.start = Point(0, 0)
+            self.end = Point(a, b)
+        else:
+            self.start = a
+            self.end = b
+
+    def __repr__(self):
+        return 'Vector({0} -> {1})'.format(self.start, self.end)
 
     @property
     def dx(self):
@@ -35,3 +43,14 @@ class Vector:
             delta = self.delta * k
 
             self.end = self.start + delta
+
+    def angle_to(self, v):
+        angle = atan2(v.dy, v.dx) - atan2(self.dy, self.dx)
+
+        while angle > pi:
+            angle -= 2.0 * pi
+
+        while angle < -pi:
+            angle += 2.0 * pi
+
+        return angle
