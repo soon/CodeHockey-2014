@@ -28,7 +28,7 @@ class ForwardStrategy(BaseStrategy):
         super().__init__(me, world, game, move, info)
 
         self._allowed_distance_to_pre_attack_position = 50
-        self._allowed_distance_to_goal_position = 350
+        self._allowed_distance_to_goal_position = 400
         self._allowed_distance = 70
         self._allowed_distance_to_strike = 70
         self._allowed_angle = 0.06
