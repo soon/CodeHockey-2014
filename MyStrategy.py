@@ -44,6 +44,8 @@ class MyStrategy:
         move.speed_up = strategy.speed_up
         move.turn = strategy.turn
 
+        self.strategies_info[type(strategy)] = strategy.info
+
     @property
     def strategies(self):
         return [
