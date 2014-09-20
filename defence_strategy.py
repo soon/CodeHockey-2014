@@ -65,11 +65,11 @@ class DefenceStrategy(BaseStrategy):
         }[self.state]
 
     def update_state(self):
-        state = self.get_next_state(self.state)
+        new_state = self.get_next_state(self.state)
 
-        while self.state != state:
-            self.state = state
-            state = self.get_next_state(self.state)
+        while self.state != new_state:
+            self.state = new_state
+            new_state = self.get_next_state(self.state)
 
     def get_next_state(self, state):
         if self.distance_to_defence_point > self._allowed_distance_to_defence_point:
