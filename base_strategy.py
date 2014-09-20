@@ -16,6 +16,7 @@ from model.Unit import Unit
 from model.World import World
 from iter import first
 from point import Point
+from vector import Vector
 
 
 __all__ = ['BaseStrategy']
@@ -50,6 +51,10 @@ class BaseStrategy:
     @property
     def own_puck(self):
         return self.our_team_own_puck and self.puck_owner.id == self.me.id
+
+    @property
+    def puck_is_free(self):
+        return self.puck_owner is None
 
     @property
     def opponent_team_own_puck(self):
@@ -142,13 +147,21 @@ class BaseStrategy:
         absolute_pass_angle = self.get_angle_to_unit(hockeyist)
         relative_pass_angle = absolute_pass_angle - self.pass_angle
 
-        while relative_pass_angle > pi:
-            relative_pass_angle -= 2.0 * pi
+        return self.normalize_angle(relative_pass_angle)
 
-        while relative_pass_angle < -pi:
-            relative_pass_angle += 2.0 * pi
+    @staticmethod
+    def normalize_angle(angle):
+        while angle > pi:
+            angle -= 2.0 * pi
 
-        return relative_pass_angle
+        while angle < -pi:
+            angle += 2.0 * pi
+
+        return angle
+
+    @staticmethod
+    def invert_angle(angle):
+        return BaseStrategy.normalize_angle(angle + pi)
 
     @property
     def pass_angle(self):
@@ -215,7 +228,7 @@ class BaseStrategy:
         return self.get_goal_net_top_corner(self.player)
 
     @property
-    def goal_net_top_corner(self):
+    def goal_net_bottom_corner(self):
         return self.get_goal_net_bottom_corner(self.player)
 
     @staticmethod
@@ -261,6 +274,34 @@ class BaseStrategy:
             return ActionType.CANCEL_STRIKE
         else:
             return ActionType.NONE
+
+    def unit_is_ahead(self, unit):
+        return abs(self.get_angle_to_unit(unit)) < pi / 2
+
+    def unit_is_behind(self, unit):
+        return not self.unit_is_ahead(unit)
+
+    @property
+    def puck_speed_vector(self) -> Vector:
+        return Vector(self.puck.speed_x, self.puck.speed_y)
+
+    @property
+    def puck_is_moving(self):
+        return self.puck_speed_vector.length > 0
+
+    @property
+    def puck_position(self):
+        return Point(self.puck.x, self.puck.y)
+
+    @property
+    def puck_is_moving_to_our_goal_net(self):
+        top = Vector(self.puck_position, self.goal_net_top_corner)
+        bottom = Vector(self.puck_position, self.goal_net_bottom_corner)
+
+        angle_to_top = self.puck_speed_vector.angle_to(top)
+        angle_to_bottom = self.puck_speed_vector.angle_to(bottom)
+
+        return self.puck_is_free and self.puck_is_moving and angle_to_top <= 0 <= angle_to_bottom
 
     #endregion
 
