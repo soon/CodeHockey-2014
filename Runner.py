@@ -9,6 +9,9 @@ class Runner:
         if sys.argv.__len__() == 4:
             self.remote_process_client = RemoteProcessClient(sys.argv[1], int(sys.argv[2]))
             self.token = sys.argv[3]
+        elif sys.argv.__len__() == 2:
+            self.remote_process_client = RemoteProcessClient('127.0.0.1', int(sys.argv[1]))
+            self.token = "0000000000000000"
         else:
             self.remote_process_client = RemoteProcessClient("127.0.0.1", 31001)
             self.token = "0000000000000000"
