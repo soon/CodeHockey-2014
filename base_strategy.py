@@ -258,7 +258,10 @@ class BaseStrategy:
         if self.own_puck:
             return ActionType.NONE
         elif self.can_influence_puck:
-            return ActionType.TAKE_PUCK
+            if self.opponent_team_own_puck:
+                return ActionType.STRIKE
+            else:
+                return ActionType.TAKE_PUCK
         elif self.can_influence_opponent:
             return self.kick_opponent_action
         elif self.last_action == ActionType.SWING:
