@@ -130,12 +130,17 @@ class ForwardStrategy(BaseStrategy):
                 state = StrategyState.move_to_goal_position
 
             elif (state == StrategyState.move_to_goal_position and
-                    self.distance_to_nearest_goal_position < self._allowed_distance_to_goal_position):
+                    (self.distance_to_nearest_goal_position < self._allowed_distance_to_goal_position or
+                     self.opponent_is_going_to_prevent_attack)):
                 state = StrategyState.ready_to_strike
         else:
             state = StrategyState.take_puck
 
         self.info['state'] = state
+
+    @property
+    def opponent_is_going_to_prevent_attack(self):
+        return any(self.unit_is_moving_to_us(h) for h in self.opponent_hockeyists)
 
     @property
     def nearest_pre_attack_position(self):
