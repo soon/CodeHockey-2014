@@ -14,7 +14,7 @@ class NoGoaliesStrategy(BaseStrategy):
     def __init__(self, me, world, game, move, info):
         super().__init__(me, world, game, move, info)
 
-        strategy = SimpleStrikerStrategy if self.our_team_own_puck else DefenceStrategy
+        strategy = DefenceStrategy if self.opponent_team_own_puck else SimpleStrikerStrategy
 
         self.strategy = strategy(me, world, game, move, info[strategy])
 
