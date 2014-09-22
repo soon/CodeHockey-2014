@@ -38,7 +38,7 @@ class BaseStrategy:
         self.info = info
 
         self._dangerous_puck_speed_vector_length = 15
-        self._allowed_opponent_distance_to_our_goal_net = 500
+        self._allowed_opponent_distance_to_our_goal_net = 700
 
     #region Utils
 
