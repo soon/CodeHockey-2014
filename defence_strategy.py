@@ -27,7 +27,7 @@ class DefenceStrategy(BaseStrategy):
     def __init__(self, me, world, game, move, info):
         super().__init__(me, world, game, move, info)
 
-        self._allowed_distance_to_defence_point = 50
+        self._allowed_distance_to_defence_point = 40
 
         self.update_state()
 
@@ -100,7 +100,7 @@ class DefenceStrategy(BaseStrategy):
 
     @staticmethod
     def get_defence_vertical(player):
-        return abs(150 - player.net_back)
+        return abs(140 - player.net_back)
 
     @property
     def defence_vertical(self):
