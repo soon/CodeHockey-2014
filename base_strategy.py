@@ -38,6 +38,7 @@ class BaseStrategy:
         self.info = info
 
         self._dangerous_puck_speed_vector_length = 15
+        self._allowed_opponent_distance_to_our_goal_net = 500
 
     #region Utils
 
@@ -286,9 +287,25 @@ class BaseStrategy:
     def unit_is_behind(self, unit):
         return not self.unit_is_ahead(unit)
 
+    @staticmethod
+    def get_speed_vector(unit) -> Vector:
+        return Vector(BaseStrategy.get_unit_position(unit),
+                      BaseStrategy.get_unit_position(unit) + Point(unit.speed_x, unit.speed_y))
+
+    @staticmethod
+    def get_unit_position(unit) -> Point:
+        return Point(unit.x, unit.y)
+
     @property
     def puck_speed_vector(self) -> Vector:
-        return Vector(self.puck.speed_x, self.puck.speed_y)
+        return self.get_speed_vector(self.puck)
+
+    @staticmethod
+    def vector_is_between(v1, v2, v3):
+        angle1 = v1.angle_to(v2)
+        angle2 = v1.angle_to(v3)
+
+        return angle1 <= 0 <= angle2 or angle2 <= 0 <= angle1
 
     @property
     def puck_is_moving(self):
@@ -302,11 +319,7 @@ class BaseStrategy:
         top = Vector(self.puck_position, self.get_goal_net_top_corner(player))
         bottom = Vector(self.puck_position, self.get_goal_net_bottom_corner(player))
 
-        angle_to_top = self.puck_speed_vector.angle_to(top)
-        angle_to_bottom = self.puck_speed_vector.angle_to(bottom)
-
-        return self.puck_is_free and self.puck_is_moving and (angle_to_top <= 0 <= angle_to_bottom or
-                                                              angle_to_bottom <= 0 <= angle_to_top)
+        return self.puck_is_free and self.puck_is_moving and self.vector_is_between(self.puck_speed_vector, top, bottom)
 
     @property
     def puck_is_moving_to_our_goal_net(self):
@@ -320,6 +333,20 @@ class BaseStrategy:
     def puck_is_dangerous(self):
         return (self.puck_is_moving_to_our_goal_net and
                 self.puck_speed_vector.length > self._dangerous_puck_speed_vector_length)
+
+    @property
+    def opponent_is_going_to_attack(self):
+        if self.opponent_team_own_puck:
+            puck_owner = self.puck_owner
+
+            center = Vector(self.get_unit_position(puck_owner), self.goal_net_center)
+            top = Vector(self.get_unit_position(puck_owner), self.goal_net_top_corner)
+            bottom = Vector(self.get_unit_position(puck_owner), self.goal_net_bottom_corner)
+
+            return (self.vector_is_between(center, top, bottom) and
+                    center.length < self._allowed_opponent_distance_to_our_goal_net)
+        else:
+            return False
 
     #endregion
 
