@@ -57,9 +57,9 @@ class DefenceStrategy(BaseStrategy):
     def action(self):
         return {
             StrategyState.undefined: ActionType.NONE,
-            StrategyState.move_to_defence_point: self.take_puck_or_attack_opponent,
-            StrategyState.normalize_speed: self.take_puck_or_attack_opponent,
-            StrategyState.wait_for_attack: self.take_puck_or_attack_opponent,
+            StrategyState.move_to_defence_point: self.take_puck_or_prevent_attack_or_attack_opponent,
+            StrategyState.normalize_speed: self.take_puck_or_prevent_attack_or_attack_opponent,
+            StrategyState.wait_for_attack: self.take_puck_or_prevent_attack_or_attack_opponent,
             StrategyState.the_puck_is_moving_to_our_goal_net: ActionType.NONE,
             StrategyState.prevent_attack: ActionType.STRIKE
         }[self.state]

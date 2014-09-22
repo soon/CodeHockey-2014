@@ -37,6 +37,8 @@ class BaseStrategy:
         self.move = move
         self.info = info
 
+        self._dangerous_puck_speed_vector_length = 15
+
     #region Utils
 
     @property
@@ -254,11 +256,11 @@ class BaseStrategy:
             return ActionType.SWING
 
     @property
-    def take_puck_or_attack_opponent(self):
+    def take_puck_or_prevent_attack_or_attack_opponent(self):
         if self.own_puck:
             return ActionType.NONE
         elif self.can_influence_puck:
-            if self.opponent_team_own_puck:
+            if self.opponent_team_own_puck or self.puck_is_dangerous:
                 return ActionType.STRIKE
             else:
                 return ActionType.TAKE_PUCK
@@ -296,15 +298,28 @@ class BaseStrategy:
     def puck_position(self):
         return Point(self.puck.x, self.puck.y)
 
-    @property
-    def puck_is_moving_to_our_goal_net(self):
-        top = Vector(self.puck_position, self.goal_net_top_corner)
-        bottom = Vector(self.puck_position, self.goal_net_bottom_corner)
+    def puck_is_moving_to_goal_net(self, player):
+        top = Vector(self.puck_position, self.get_goal_net_top_corner(player))
+        bottom = Vector(self.puck_position, self.get_goal_net_bottom_corner(player))
 
         angle_to_top = self.puck_speed_vector.angle_to(top)
         angle_to_bottom = self.puck_speed_vector.angle_to(bottom)
 
-        return self.puck_is_free and self.puck_is_moving and angle_to_top <= 0 <= angle_to_bottom
+        return self.puck_is_free and self.puck_is_moving and (angle_to_top <= 0 <= angle_to_bottom or
+                                                              angle_to_bottom <= 0 <= angle_to_top)
+
+    @property
+    def puck_is_moving_to_our_goal_net(self):
+        return self.puck_is_moving_to_goal_net(self.player)
+
+    @property
+    def puck_is_moving_to_opponent_goal_net(self):
+        return self.puck_is_moving_to_goal_net(self.opponent)
+
+    @property
+    def puck_is_dangerous(self):
+        return (self.puck_is_moving_to_our_goal_net and
+                self.puck_speed_vector.length > self._dangerous_puck_speed_vector_length)
 
     #endregion
 

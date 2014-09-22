@@ -63,8 +63,8 @@ class ForwardStrategy(BaseStrategy):
     @property
     def action(self):
         return {
-            StrategyState.undefined: self.take_puck_or_attack_opponent,
-            StrategyState.take_puck: self.take_puck_or_attack_opponent,
+            StrategyState.undefined: self.take_puck_or_prevent_attack_or_attack_opponent,
+            StrategyState.take_puck: self.take_puck_or_prevent_attack_or_attack_opponent,
             StrategyState.set_to_attack: ActionType.NONE,
             StrategyState.go_to_attack_position: ActionType.NONE,
             StrategyState.rotate_to_goal_position: ActionType.NONE,
