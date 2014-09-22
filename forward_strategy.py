@@ -140,7 +140,7 @@ class ForwardStrategy(BaseStrategy):
 
     @property
     def opponent_is_going_to_prevent_attack(self):
-        return any(self.unit_is_moving_to_us(h) for h in self.opponent_hockeyists)
+        return any(self.unit_is_ahead(h) and self.unit_is_moving_to_us(h) for h in self.opponent_hockeyists)
 
     @property
     def nearest_pre_attack_position(self):
