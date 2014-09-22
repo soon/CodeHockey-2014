@@ -33,6 +33,7 @@ class ForwardStrategy(BaseStrategy):
         self._allowed_distance_to_strike = 70
         self._allowed_angle = 0.06
         self._max_swing_ticks = 8
+        self._allowed_distance_to_opponent = self.stick_length * 2
 
         self.update_state()
 
@@ -131,7 +132,7 @@ class ForwardStrategy(BaseStrategy):
 
             elif (state == StrategyState.move_to_goal_position and
                     (self.distance_to_nearest_goal_position < self._allowed_distance_to_goal_position or
-                     self.opponent_is_going_to_prevent_attack)):
+                     self.opponent_is_going_to_prevent_attack or self.opponent_is_nearby)):
                 state = StrategyState.ready_to_strike
         else:
             state = StrategyState.take_puck
@@ -141,6 +142,10 @@ class ForwardStrategy(BaseStrategy):
     @property
     def opponent_is_going_to_prevent_attack(self):
         return any(self.unit_is_ahead(h) and self.unit_is_moving_to_us(h) for h in self.opponent_hockeyists)
+
+    @property
+    def opponent_is_nearby(self):
+        return any(self.get_distance_to_unit(h) < self._allowed_distance_to_opponent for h in self.hockeyists)
 
     @property
     def nearest_pre_attack_position(self):
