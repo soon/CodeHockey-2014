@@ -14,6 +14,7 @@ class MyStrategy:
     def __init__(self):
         self._strategies_info = None
 
+        self.last_strategy = {}
         self.strategies_info = {strategy: strategy.initial_info() for strategy in self.strategies}
 
     @staticmethod
@@ -30,10 +31,12 @@ class MyStrategy:
 
         if MyStrategy.no_goalies(world):
             strategy = NoGoaliesStrategy
-        elif MyStrategy.is_forward(strategy):
-            strategy = ForwardStrategy
+        elif strategy.opponent_team_own_puck:
+            strategy = self.last_strategy[me.id]
         else:
-            strategy = DefenceStrategy
+            strategy = ForwardStrategy if self.is_forward(strategy) else DefenceStrategy
+
+        self.last_strategy[me.id] = strategy
 
         return strategy(me, world, game, move, self.strategies_info[strategy])
 
