@@ -85,26 +85,32 @@ class DefenceStrategy(BaseStrategy):
 
         if state == StrategyState.undefined:
             return StrategyState.move_to_defence_point
+
         elif (state == StrategyState.move_to_defence_point and
                 self.distance_to_defence_point < self._allowed_distance_to_defence_point):
             return StrategyState.normalize_speed
+
         elif state == StrategyState.normalize_speed:
             return StrategyState.wait_for_attack
+
         elif state == StrategyState.wait_for_attack:
             if self.opponent_is_going_to_attack:
                 return StrategyState.opponent_is_going_to_attack
             elif self.puck_is_moving_to_our_goal_net:
                 return StrategyState.the_puck_is_moving_to_our_goal_net
+
         elif state == StrategyState.opponent_is_going_to_attack:
             if self.puck_is_moving_to_our_goal_net:
                 return StrategyState.the_puck_is_moving_to_our_goal_net
             elif not self.opponent_is_going_to_attack:
                 return StrategyState.move_to_defence_point
+
         elif state == StrategyState.the_puck_is_moving_to_our_goal_net:
             if not self.puck_is_moving_to_our_goal_net:
                 return StrategyState.move_to_defence_point
             if self.can_influence_puck:
                 return StrategyState.prevent_attack
+
         elif state == StrategyState.prevent_attack and not self.puck_is_moving_to_our_goal_net:
             return StrategyState.move_to_defence_point
 
