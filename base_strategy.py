@@ -38,7 +38,7 @@ class BaseStrategy:
         self.info = info
 
         self._dangerous_puck_speed_vector_length = 15
-        self._allowed_opponent_distance_to_our_goal_net = 700
+        self._allowed_opponent_distance_to_our_goal_net = 600
         self._allowed_angle_between_codirectional_vectors = 0.1
 
     #region Utils
@@ -147,8 +147,23 @@ class BaseStrategy:
         return sorted(self.my_hockeyists, key=self.get_distance_to_unit)[1]
 
     @property
+    def nearest_opponent(self):
+        return sorted(self.opponent_hockeyists, key=self.get_distance_to_unit)[1]
+
+    @property
     def angle_to_nearest_teammate(self):
         return self.get_angle_to_unit(self.nearest_teammate)
+
+    @property
+    def angle_to_nearest_opponent(self):
+        return self.get_angle_to_unit(self.nearest_opponent)
+
+    def get_angle_to_goal_net_center(self, player):
+        return self.get_angle_to_unit(self.get_goal_net_center(player))
+
+    @property
+    def angle_to_opponent_goal_net_center(self):
+        return self.get_angle_to_goal_net_center(self.opponent)
 
     def can_pass_to(self, teammate):
         return self.get_angle_to_unit(teammate) < self.pass_sector / 2
@@ -199,11 +214,19 @@ class BaseStrategy:
 
     @property
     def opponent_hockeyists(self) -> [Hockeyist]:
+        return [h for h in self.opponent_hockeyists_with_goalie if h.type != HockeyistType.GOALIE]
+
+    @property
+    def opponent_hockeyists_with_goalie(self):
         return [h for h in self.hockeyists if not h.teammate]
 
     @property
     def my_hockeyists(self) -> [Hockeyist]:
-        return [h for h in self.hockeyists if h.teammate and h.type != HockeyistType.GOALIE]
+        return [h for h in self.my_hockeyists_with_goalie if h.type != HockeyistType.GOALIE]
+
+    @property
+    def my_hockeyists_with_goalie(self):
+        return [h for h in self.hockeyists if h.teammate]
 
     @property
     def last_action(self):
