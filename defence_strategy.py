@@ -18,8 +18,9 @@ class StrategyState(Enum):
     move_to_defence_point = 2
     normalize_speed = 3
     wait_for_attack = 4
-    the_puck_is_moving_to_our_goal_net = 5
-    prevent_attack = 6
+    opponent_is_going_to_attack = 5
+    the_puck_is_moving_to_our_goal_net = 6
+    prevent_attack = 7
 
 
 class DefenceStrategy(BaseStrategy):
@@ -38,6 +39,7 @@ class DefenceStrategy(BaseStrategy):
             StrategyState.move_to_defence_point: self.speed_up_to_defence_point,
             StrategyState.normalize_speed: 0.0,
             StrategyState.wait_for_attack: 0.0,
+            StrategyState.opponent_is_going_to_attack: 1.0,
             StrategyState.the_puck_is_moving_to_our_goal_net: 0.0,
             StrategyState.prevent_attack: 0.0
         }[self.state]
@@ -49,6 +51,7 @@ class DefenceStrategy(BaseStrategy):
             StrategyState.move_to_defence_point: self.angle_to_defence_point,
             StrategyState.normalize_speed: 0.0,
             StrategyState.wait_for_attack: self.angle_to_puck,
+            StrategyState.opponent_is_going_to_attack: self.angle_to_puck,
             StrategyState.the_puck_is_moving_to_our_goal_net: self.angle_to_puck,
             StrategyState.prevent_attack: self.angle_to_puck
         }[self.state]
@@ -60,6 +63,7 @@ class DefenceStrategy(BaseStrategy):
             StrategyState.move_to_defence_point: self.take_puck_or_prevent_attack_or_attack_opponent,
             StrategyState.normalize_speed: self.take_puck_or_prevent_attack_or_attack_opponent,
             StrategyState.wait_for_attack: self.take_puck_or_prevent_attack_or_attack_opponent,
+            StrategyState.opponent_is_going_to_attack: self.take_puck_or_prevent_attack_or_attack_opponent,
             StrategyState.the_puck_is_moving_to_our_goal_net: ActionType.NONE,
             StrategyState.prevent_attack: ActionType.STRIKE
         }[self.state]
@@ -86,8 +90,16 @@ class DefenceStrategy(BaseStrategy):
             return StrategyState.normalize_speed
         elif state == StrategyState.normalize_speed:
             return StrategyState.wait_for_attack
-        elif state == StrategyState.wait_for_attack and self.puck_is_moving_to_our_goal_net:
-            return StrategyState.the_puck_is_moving_to_our_goal_net
+        elif state == StrategyState.wait_for_attack:
+            if self.opponent_is_going_to_attack:
+                return StrategyState.opponent_is_going_to_attack
+            elif self.puck_is_moving_to_our_goal_net:
+                return StrategyState.the_puck_is_moving_to_our_goal_net
+        elif state == StrategyState.opponent_is_going_to_attack:
+            if self.puck_is_moving_to_our_goal_net:
+                return StrategyState.the_puck_is_moving_to_our_goal_net
+            elif not self.opponent_is_going_to_attack:
+                return StrategyState.move_to_defence_point
         elif state == StrategyState.the_puck_is_moving_to_our_goal_net:
             if not self.puck_is_moving_to_our_goal_net:
                 return StrategyState.move_to_defence_point
