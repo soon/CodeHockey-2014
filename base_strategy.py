@@ -335,7 +335,7 @@ class BaseStrategy:
         angle1 = v1.angle_to(v2)
         angle2 = v1.angle_to(v3)
 
-        return angle1 <= 0 <= angle2 or angle2 <= 0 <= angle1
+        return (angle1 <= 0 <= angle2 or angle2 <= 0 <= angle1) and abs(angle1) < pi / 2 and abs(angle2) < pi / 2
 
     @property
     def puck_is_moving(self):
