@@ -39,6 +39,7 @@ class BaseStrategy:
 
         self._dangerous_puck_speed_vector_length = 15
         self._allowed_opponent_distance_to_our_goal_net = 700
+        self._allowed_angle_between_codirectional_vectors = 0.1
 
     #region Utils
 
@@ -129,6 +130,12 @@ class BaseStrategy:
 
     def get_angle_to(self, x, y):
         return self.me.get_angle_to(x, y)
+
+    def unit_is_moving_to_us(self, unit):
+        speed_vector = self.get_speed_vector(unit)
+        vector_to_us = Vector(self.get_unit_position(unit), self.get_unit_position(self.me))
+
+        return abs(speed_vector.angle_to(vector_to_us)) < self._allowed_angle_between_codirectional_vectors
 
     @property
     def angle(self):
