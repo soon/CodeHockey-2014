@@ -8,15 +8,16 @@ from forward_strategy import ForwardStrategy
 from base_strategy import BaseStrategy
 from defence_strategy import DefenceStrategy
 from no_goalies_strategy import NoGoaliesStrategy
+from strategies_shared_info import StrategiesSharedInfo
 
 
 class MyStrategy:
 
     def __init__(self):
-        self._strategies_info = None
+        self._strategies_info = StrategiesSharedInfo()
 
         self.last_strategy = {}
-        self.strategies_info = {strategy: strategy.initial_info() for strategy in self.strategies}
+        self.info = self.info or {strategy: strategy.initial_info() for strategy in self.strategies}
 
     @staticmethod
     def no_goalies(world):
@@ -28,14 +29,14 @@ class MyStrategy:
                                            key=lambda h: h.get_distance_to_unit(strategy.puck))[0].id == strategy.me.id
 
     def create_strategy(self, me, world, game, move) -> BaseStrategy:
-        strategy = BaseStrategy(me, world, game, move, self.strategies_info[BaseStrategy])
+        strategy = BaseStrategy(me, world, game, move, self.info[BaseStrategy])
 
         if MyStrategy.no_goalies(world):
             strategy = NoGoaliesStrategy
         elif strategy.opponent_team_own_puck:
             strategy = self.last_strategy[me.id]
 
-            if strategy == DefencemanKickerStrategy:
+            if strategy == DefencemanKickerStrategy or all(s == ForwardStrategy for s in self.last_strategy.values()):
                 strategy = DefenceStrategy
         else:
             if self.is_forward(strategy):
@@ -47,7 +48,7 @@ class MyStrategy:
 
         self.last_strategy[me.id] = strategy
 
-        return strategy(me, world, game, move, self.strategies_info[strategy])
+        return strategy(me, world, game, move, self.info[strategy])
 
     def move(self, me: Hockeyist, world: World, game: Game, move: Move):
         strategy = self.create_strategy(me, world, game, move)
@@ -56,7 +57,7 @@ class MyStrategy:
         move.speed_up = strategy.speed_up
         move.turn = strategy.turn
 
-        self.strategies_info[type(strategy)] = strategy.info
+        self.info[type(strategy)] = strategy.info
 
     @property
     def strategies(self):
@@ -69,9 +70,17 @@ class MyStrategy:
         ]
 
     @property
-    def strategies_info(self):
-        return self._strategies_info
+    def info(self):
+        return self._strategies_info.info
 
-    @strategies_info.setter
-    def strategies_info(self, value):
-        self._strategies_info = value
+    @info.setter
+    def info(self, value):
+        self._strategies_info.info = value
+
+    @property
+    def last_strategy(self):
+        return self._strategies_info.last_strategy
+
+    @last_strategy.setter
+    def last_strategy(self, value):
+        self._strategies_info.last_strategy = value
