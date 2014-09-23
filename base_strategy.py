@@ -40,6 +40,7 @@ class BaseStrategy:
         self._dangerous_puck_speed_vector_length = 15
         self._allowed_opponent_distance_to_our_goal_net = 600
         self._allowed_angle_between_codirectional_vectors = 0.1
+        self._opponent_defenceman_distance = 100
 
     #region Utils
 
@@ -377,6 +378,20 @@ class BaseStrategy:
                     center.length < self._allowed_opponent_distance_to_our_goal_net)
         else:
             return False
+
+    @property
+    def opponent_defenceman(self):
+        defenceman = sorted(self.opponent_hockeyists,
+                            key=lambda h: h.get_distance_to_unit(self.opponent_goal_net_center))[0]
+
+        if defenceman.get_distance_to_unit(self.opponent_goal_net_center) < self._opponent_defenceman_distance:
+            return defenceman
+        else:
+            return None
+
+    @property
+    def opponent_has_defenceman(self):
+        return self.opponent_defenceman is not None
 
     #endregion
 
