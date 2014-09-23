@@ -73,14 +73,14 @@ class SimpleStrikerStrategy(BaseStrategy):
     def get_next_state(self, state):
         if not self.our_team_own_puck:
             state = StrategyState.take_puck
-        else:
+        elif not self.own_puck:
             state = StrategyState.kick_all_opponents
 
         if state == StrategyState.take_puck and self.own_puck:
            state = StrategyState.turn_to_opponent_goal_net
 
         elif (state == StrategyState.turn_to_opponent_goal_net and
-                      self.get_angle_to_unit(self.opponent_goal_net_center) < self._allowed_angle):
+                      abs(self.get_angle_to_unit(self.opponent_goal_net_center)) < self._allowed_angle):
             state = StrategyState.attack
 
         return state
