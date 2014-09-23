@@ -41,7 +41,9 @@ class MyStrategy:
         else:
             if self.is_forward(strategy):
                 strategy = ForwardStrategy
-            elif strategy.opponent_has_defenceman and strategy.our_team_own_puck:
+            elif (strategy.opponent_has_defenceman and
+                  strategy.our_team_own_puck and
+                  strategy.opponent_score > strategy.my_score):
                 strategy = DefencemanKickerStrategy
             else:
                 strategy = DefenceStrategy
