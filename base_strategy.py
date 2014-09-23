@@ -291,7 +291,7 @@ class BaseStrategy:
     def take_puck_or_prevent_attack_or_attack_opponent(self):
         if self.own_puck:
             return ActionType.NONE
-        elif self.can_influence_puck:
+        elif self.can_influence_puck and not self.our_team_own_puck:
             if self.opponent_team_own_puck or self.puck_is_dangerous:
                 return ActionType.STRIKE
             else:
