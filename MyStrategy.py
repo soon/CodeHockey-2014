@@ -1,3 +1,4 @@
+from defenceman_kicker_strategy import DefencemanKickerStrategy
 from model.Game import Game
 from model.HockeyistType import HockeyistType
 from model.Move import Move
@@ -33,8 +34,16 @@ class MyStrategy:
             strategy = NoGoaliesStrategy
         elif strategy.opponent_team_own_puck:
             strategy = self.last_strategy[me.id]
+
+            if strategy == DefencemanKickerStrategy:
+                strategy = DefenceStrategy
         else:
-            strategy = ForwardStrategy if self.is_forward(strategy) else DefenceStrategy
+            if self.is_forward(strategy):
+                strategy = ForwardStrategy
+            elif strategy.opponent_has_defenceman and strategy.our_team_own_puck:
+                strategy = DefencemanKickerStrategy
+            else:
+                strategy = DefenceStrategy
 
         self.last_strategy[me.id] = strategy
 
@@ -55,7 +64,8 @@ class MyStrategy:
             BaseStrategy,
             DefenceStrategy,
             ForwardStrategy,
-            NoGoaliesStrategy
+            NoGoaliesStrategy,
+            DefencemanKickerStrategy
         ]
 
     @property
