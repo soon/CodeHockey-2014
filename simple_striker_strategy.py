@@ -12,12 +12,15 @@ class StrategyState(Enum):
     turn_to_opponent_goal_net = 3
     attack = 4
 
+
 class SimpleStrikerStrategy(BaseStrategy):
 
     def __init__(self, me, world, game, move, info):
         super().__init__(me, world, game, move, info)
 
         self._allowed_angle = 0.07
+
+        self.update_state()
 
     @property
     def speed_up(self):
@@ -79,3 +82,5 @@ class SimpleStrikerStrategy(BaseStrategy):
         elif (state == StrategyState.turn_to_opponent_goal_net and
                       self.get_angle_to_unit(self.opponent_goal_net_center) < self._allowed_angle):
             state = StrategyState.attack
+
+        return state
