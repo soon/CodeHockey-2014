@@ -40,7 +40,7 @@ class BaseStrategy:
         self._dangerous_puck_speed_vector_length = 15
         self._allowed_opponent_distance_to_our_goal_net = 600
         self._allowed_angle_between_codirectional_vectors = 0.1
-        self._opponent_defenceman_distance = 100
+        self._opponent_defenceman_distance = 120
 
     #region Utils
 
