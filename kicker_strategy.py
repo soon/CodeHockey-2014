@@ -19,7 +19,7 @@ class KickerStrategy(BaseStrategy):
         if self.can_influence_by_stick(self.opponent_to_be_attacked):
             return self.kick_opponent_action
         else:
-            return ActionType.NONE
+            return ActionType.CANCEL_STRIKE
 
     @property
     def opponent_to_be_attacked(self):
