@@ -18,7 +18,7 @@ class SimpleStrikerStrategy(BaseStrategy):
     def __init__(self, me, world, game, move, info):
         super().__init__(me, world, game, move, info)
 
-        self._allowed_angle = 0.07
+        self._allowed_angle = 0.3
 
         self.update_state()
 
@@ -73,7 +73,9 @@ class SimpleStrikerStrategy(BaseStrategy):
     def get_next_state(self, state):
         if not self.our_team_own_puck:
             state = StrategyState.take_puck
-        elif not self.own_puck:
+        elif self.own_puck:
+            state = StrategyState.turn_to_opponent_goal_net
+        else:
             state = StrategyState.kick_all_opponents
 
         if state == StrategyState.take_puck and self.own_puck:
