@@ -29,6 +29,7 @@ class DefenceStrategy(BaseStrategy):
         super().__init__(me, world, game, move, info)
 
         self._allowed_distance_to_defence_point = 40
+        self._allowed_distance_to_move_backward = 300
 
         self.update_state()
 
@@ -136,16 +137,20 @@ class DefenceStrategy(BaseStrategy):
     def speed_up_to_defence_point(self):
         speed_up = self.distance_to_defence_point / 100
 
-        if self.unit_is_behind(self.defence_point):
+        if self.should_move_backward(self.defence_point):
             speed_up = -speed_up
 
         return speed_up
+
+    def should_move_backward(self, position):
+        return (self.unit_is_behind(position) and
+                self.get_distance_to_unit(position) < self._allowed_distance_to_move_backward)
 
     @property
     def angle_to_defence_point(self):
         angle = self.get_angle_to_unit(self.defence_point)
         
-        if self.unit_is_behind(self.defence_point):
+        if self.should_move_backward(self.defence_point):
             angle = self.invert_angle(angle)
             
         return angle
