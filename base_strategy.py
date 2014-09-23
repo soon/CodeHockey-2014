@@ -393,6 +393,14 @@ class BaseStrategy:
     def opponent_has_defenceman(self):
         return self.opponent_defenceman is not None
 
+    @property
+    def my_score(self):
+        return self.player.goal_count
+
+    @property
+    def opponent_score(self):
+        return self.opponent.goal_count
+
     #endregion
 
     #region Properties
