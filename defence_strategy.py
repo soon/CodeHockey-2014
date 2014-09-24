@@ -135,7 +135,7 @@ class DefenceStrategy(BaseStrategy):
 
     @property
     def speed_up_to_defence_point(self):
-        speed_up = self.distance_to_defence_point / 100
+        speed_up = (self.distance_to_defence_point / 20)**0.5
 
         if self.should_move_backward(self.defence_point):
             speed_up = -speed_up
