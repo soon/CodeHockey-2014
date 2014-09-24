@@ -81,7 +81,7 @@ class DefenceStrategy(BaseStrategy):
             if self.state in (StrategyState.undefined,
                               StrategyState.move_to_defence_point,
                               StrategyState.normalize_speed,
-                              StrategyState.wait_for_attack):
+                              StrategyState.wait_for_attack) and not self.opponent_is_going_to_attack:
                 return StrategyState.move_to_defence_point
 
         if state == StrategyState.undefined:
