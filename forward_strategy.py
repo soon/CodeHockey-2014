@@ -76,7 +76,8 @@ class ForwardStrategy(BaseStrategy):
     @staticmethod
     def initial_info():
         return {
-            'state': StrategyState.undefined
+            'state': StrategyState.undefined,
+            'pre_attack_position': None
         }
 
     @staticmethod
@@ -96,7 +97,7 @@ class ForwardStrategy(BaseStrategy):
 
     @staticmethod
     def get_pre_attack_vertical(player):
-        return abs(700 - player.net_back)
+        return abs(650 - player.net_back)
 
     @property
     def pre_attack_vertical(self):
@@ -104,7 +105,10 @@ class ForwardStrategy(BaseStrategy):
 
     @property
     def pre_attack_positions(self):
-        return [Point(self.pre_attack_vertical, p.y) for p in self.attack_positions]
+        return [
+            Point(self.pre_attack_vertical, 240),
+            Point(self.pre_attack_vertical, 680)
+        ]
 
     def get_goal_position(self, attack_point: Point) -> Point:
         return Point((self.opponent.net_front + self.opponent.net_back) / 2,
@@ -117,6 +121,11 @@ class ForwardStrategy(BaseStrategy):
         while self.state != new_state:
             self.state = new_state
             new_state = self.get_next_state(self.state)
+
+        if self.state == StrategyState.set_to_attack:
+            self.pre_attack_position_info = self.optimal_pre_attack_position
+        else:
+            self.pre_attack_position_info = None
 
     def get_next_state(self, state):
         if self.our_team_own_puck:
@@ -159,6 +168,14 @@ class ForwardStrategy(BaseStrategy):
         self.info['state'] = value
 
     @property
+    def pre_attack_position_info(self):
+        return self.info['pre_attack_position']
+
+    @pre_attack_position_info.setter
+    def pre_attack_position_info(self, value):
+        self.info['pre_attack_position'] = value
+
+    @property
     def opponent_is_going_to_prevent_attack(self):
         return any(self.unit_is_ahead(h) and self.unit_is_moving_to_us(h) for h in self.opponent_hockeyists)
 
@@ -167,12 +184,22 @@ class ForwardStrategy(BaseStrategy):
         return any(self.get_distance_to_unit(h) < self._allowed_distance_to_opponent for h in self.opponent_hockeyists)
 
     @property
-    def nearest_pre_attack_position(self):
-        return sorted(self.pre_attack_positions, key=self.get_distance_to_unit)[0]
+    def optimal_pre_attack_position(self):
+        if self.pre_attack_position_info:
+            return self.pre_attack_position_info
+        else:
+            opponents_on_top = sum(h.y > self.goal_net_horizontal for h in self.opponent_hockeyists)
+
+            if opponents_on_top > len(self.opponent_hockeyists) / 2:
+                return self.pre_attack_positions[0]
+            elif opponents_on_top < len(self.opponent_hockeyists) / 2:
+                return self.pre_attack_positions[1]
+            else:
+                return sorted(self.pre_attack_positions, key=self.get_distance_to_unit)[0]
 
     @property
     def angle_to_nearest_pre_attack_position(self):
-        return self.get_angle_to_unit(self.nearest_pre_attack_position)
+        return self.get_angle_to_unit(self.optimal_pre_attack_position)
 
     @property
     def nearest_attack_position(self):
@@ -188,7 +215,7 @@ class ForwardStrategy(BaseStrategy):
 
     @property
     def distance_to_nearest_pre_attack_position(self):
-        return self.get_distance_to_unit(self.nearest_pre_attack_position)
+        return self.get_distance_to_unit(self.optimal_pre_attack_position)
 
     @property
     def distance_to_nearest_attack_position(self):
