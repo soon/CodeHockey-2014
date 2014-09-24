@@ -33,17 +33,20 @@ class MyStrategy:
 
         if MyStrategy.no_goalies(world):
             strategy = NoGoaliesStrategy
-        elif strategy.opponent_team_own_puck:
-            strategy = self.last_strategy[me.id]
+        elif strategy.my_score == strategy.opponent_score:
+            if strategy.opponent_team_own_puck:
+                strategy = self.last_strategy[me.id]
 
-            if strategy == DefencemanKickerStrategy or all(s == ForwardStrategy for s in self.last_strategy.values()):
-                strategy = DefenceStrategy
+                if strategy == DefencemanKickerStrategy or all(s == ForwardStrategy for s in self.last_strategy.values()):
+                    strategy = DefenceStrategy
+            else:
+                strategy = ForwardStrategy if self.is_forward(strategy) else DefenceStrategy
+        elif strategy.my_score > strategy.opponent_score:
+            strategy = DefenceStrategy
         else:
             if self.is_forward(strategy):
                 strategy = ForwardStrategy
-            elif (strategy.opponent_has_defenceman and
-                  strategy.our_team_own_puck and
-                  strategy.opponent_score > strategy.my_score):
+            elif strategy.opponent_has_defenceman and strategy.our_team_own_puck:
                 strategy = DefencemanKickerStrategy
             else:
                 strategy = DefenceStrategy
