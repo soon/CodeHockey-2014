@@ -42,6 +42,8 @@ class BaseStrategy:
         self._allowed_angle_between_codirectional_vectors = 0.1
         self._opponent_defenceman_distance = 120
 
+        self._future = 5
+
     #region Utils
 
     @property
@@ -400,6 +402,14 @@ class BaseStrategy:
     @property
     def opponent_score(self):
         return self.opponent.goal_count
+
+    def get_future_position(self, unit):
+        a = Point(unit.speed_x, unit.speed_y) * self._future
+        return Point(unit.x, unit.y) + a
+
+    @property
+    def future_puck_position(self):
+        return self.get_future_position(self.puck)
 
     #endregion
 
