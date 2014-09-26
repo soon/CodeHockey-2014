@@ -333,6 +333,10 @@ class BaseStrategy:
     def puck_speed_vector(self) -> Vector:
         return self.get_speed_vector(self.puck)
 
+    @property
+    def speed_vector(self):
+        return self.get_speed_vector(self.me)
+
     @staticmethod
     def vector_is_between(v1, v2, v3):
         angle1 = v1.angle_to(v2)
@@ -403,6 +407,10 @@ class BaseStrategy:
     def opponent_score(self):
         return self.opponent.goal_count
 
+    @property
+    def hockeyist_max_speed(self):
+        return self.game.hockeyist_max_speed
+
     def get_future_position(self, unit):
         a = Point(unit.speed_x, unit.speed_y) * self._future
         return Point(unit.x, unit.y) + a
@@ -410,6 +418,55 @@ class BaseStrategy:
     @property
     def future_puck_position(self):
         return self.get_future_position(self.puck)
+
+    @property
+    def optimal_position_to_puck(self):
+        return self.optimal_position_to_interact_with(self.puck)
+
+    def get_future_unit_position(self, unit, seconds=1):
+        return self.get_unit_position(unit) + self.get_speed_vector(unit).delta * seconds
+
+    @property
+    def current_speed(self):
+        return self.speed_vector.length
+
+    def optimal_position_to_interact_with(self, unit):
+        minimal_speed_vector = 0.5
+
+        if self.current_speed < minimal_speed_vector and self.puck_speed_vector.length < minimal_speed_vector:
+            return self.get_unit_position(unit)
+
+        t_increase = 100
+        t_max = 1000
+
+        t_left = 0
+        t_right = t_left + t_increase
+
+        p_right = self.get_future_unit_position(unit, t_right)
+
+        while self.get_distance_to_unit(p_right) / (self.hockeyist_max_speed * 0.9) > t_right and t_right < t_max:
+            t_left, t_right = t_right, t_right + t_increase
+
+            p_right = self.get_future_unit_position(unit, t_right)
+
+        if t_right >= t_max:
+            return self.get_unit_position(unit)
+
+        t_curr = (t_left + t_right) / 2
+        p_curr = self.get_future_unit_position(unit, t_curr)
+
+        t_eps = 0.01
+
+        while abs(self.get_distance_to_unit(p_curr) / (self.hockeyist_max_speed * 0.9) - t_curr) > t_eps:
+            if self.get_distance_to_unit(p_curr) / (self.hockeyist_max_speed * 0.9) > t_curr:
+                t_left = t_curr
+            else:
+                t_right = t_curr
+
+            t_curr = (t_left + t_right) / 2
+            p_curr = self.get_future_unit_position(unit, t_curr)
+
+        return p_curr
 
     #endregion
 
