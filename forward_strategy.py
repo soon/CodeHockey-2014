@@ -53,7 +53,7 @@ class ForwardStrategy(BaseStrategy):
     def turn(self):
         return {
             StrategyState.undefined: 0.0,
-            StrategyState.take_puck: self.get_angle_to_unit(self.future_puck_position),
+            StrategyState.take_puck: self.get_angle_to_unit(self.optimal_position_to_puck),
             StrategyState.set_to_attack: self.angle_to_nearest_pre_attack_position,
             StrategyState.go_to_attack_position: self.angle_to_nearest_attack_position,
             StrategyState.rotate_to_goal_position: self.angle_to_goal_position,
