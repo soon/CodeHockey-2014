@@ -29,7 +29,7 @@ class DefenceStrategy(BaseStrategy):
         super().__init__(me, world, game, move, info)
 
         self._allowed_distance_to_defence_point = 40
-        self._allowed_distance_to_move_backward = 300
+        self._allowed_distance_to_move_backward = 350
 
         self.update_state()
 
