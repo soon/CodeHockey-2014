@@ -52,7 +52,7 @@ class DefenceStrategy(BaseStrategy):
             StrategyState.move_to_defence_point: self.angle_to_defence_point,
             StrategyState.normalize_speed: 0.0,
             StrategyState.wait_for_attack: self.angle_to_puck,
-            StrategyState.opponent_is_going_to_attack: self.angle_to_puck,
+            StrategyState.opponent_is_going_to_attack: self.get_angle_to_unit(self.optimal_position_to_puck),
             StrategyState.the_puck_is_moving_to_our_goal_net: self.angle_to_puck,
             StrategyState.prevent_attack: self.angle_to_puck
         }[self.state]
