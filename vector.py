@@ -19,6 +19,9 @@ class Vector:
     def __repr__(self):
         return 'Vector({0} -> {1})'.format(self.start, self.end)
 
+    def __mul__(self, n):
+        return Vector(self.start, self.start + self.delta * n)
+
     @property
     def dx(self):
         return self.end.x - self.start.x
