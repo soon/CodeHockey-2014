@@ -24,12 +24,14 @@ __all__ = ['BaseStrategy']
 
 class BaseStrategy:
 
-    def __init__(self, me: Hockeyist, world: World, game: Game, move: Move, info):
+    def __init__(self, me: Hockeyist, world: World, game: Game, move: Move, info=None):
         self._me = None
         self._world = None
         self._game = None
         self._move = None
         self._info = None
+
+        info = info or self.initial_info()
 
         self.me = me
         self.world = world
@@ -467,6 +469,9 @@ class BaseStrategy:
             p_curr = self.get_future_unit_position(unit, t_curr)
 
         return p_curr
+
+    def no_goalies(self):
+        return not any(h.type == HockeyistType.GOALIE for h in self.world.hockeyists)
 
     #endregion
 
